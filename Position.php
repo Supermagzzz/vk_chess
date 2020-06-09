@@ -1,18 +1,23 @@
 <?php
-	class Position {
-		private $r;
-		private $c;
 
-		function __construct($r, $c) {
-			$this->r = $r;
-			$this->c = $c;
-		}
+class Position
+{
+    private $r;
+    private $c;
 
-		function getRow() {
-			return $this->r;
-		}
+    function __construct($r, $c)
+    {
+        $this->r = $r;
+        $this->c = $c;
+    }
 
-		function getCol() {
-			return $this->c;
-		}
-	}
+    function getRow()
+    {
+        return $this->r;
+    }
+
+    function getCol()
+    {
+        return $this->c;
+    }
+}
