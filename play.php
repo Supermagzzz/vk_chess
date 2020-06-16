@@ -1,11 +1,11 @@
 <?php
 require('Board.php');
+require('JSON.php');
 
 function checkArgument($name)
 {
     if (!isset($_GET[$name])) {
-        echo json_encode(['status' => 'Fail', 'message' => $name . " argument absent"]);
-        exit();
+        jsonFail($name . " argument absent");
     }
 }
 
@@ -16,8 +16,7 @@ try {
     checkArgument('id');
     $state = Database::getState($id);
     if ($state == null) {
-        echo json_encode(["status" => "Fail", "message" => "invalid game ID"]);
-        exit();
+        jsonFail("invalid game ID");
     }
     $board = new Board($id, $state['state'], $state['turn']);
     if ($method == "print") {
@@ -28,27 +27,25 @@ try {
         } else {
             $gameState = "Normal";
         }
-        echo json_encode(['status' => 'OK', 'board' => $state['state'],
-            'turn' => ($state['turn'] ? "Black" : "White"), 'gameState' => $gameState]);
+        jsonOK(['board' => $state['state'], 'turn' => ($state['turn'] ? "Black" : "White"), 'gameState' => $gameState]);
     } else if ($method == "makeTurn") {
         $start = Database::escape($_GET['start']);
         $end = Database::escape($_GET['end']);
         checkArgument('start');
         checkArgument('end');
         if (strlen($start) != 2 || strlen($end) != 2) {
-            echo json_encode(['status' => 'Fail', 'message' => 'Invalid start or end']);
-            exit();
+            jsonFail("invalid start or end");
         }
         $pos1 = new Position(Board::getSize() - (ord($start[1]) - ord('0')) - 1, ord($start[0]) - ord('A'));
         $pos2 = new Position(Board::getSize() - (ord($end[1]) - ord('0')) - 1, ord($end[0]) - ord('A'));
         if ($board->makeTurn($pos1, $pos2)) {
-            echo json_encode(['status' => 'OK']);
+            jsonOK();
         } else {
-            echo json_encode(['status' => 'Fail', 'message' => 'Invalid turn']);
+            jsonFail("Invalid turn");
         }
     } else {
-        echo json_encode(['status' => 'Fail', 'message' => 'Invalid method']);
+        jsonFail("Invalid method");
     }
 } catch (Exception $e) {
-    echo json_encode(["status" => "Fail", "message" => $e->getMessage()]);
+    jsonFail($e->getMessage());
 }
